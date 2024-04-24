@@ -2,13 +2,15 @@
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useDebouncedCallback } from 'use-debounce';
 
 export default function Search({ placeholder }: { placeholder: string }) {
   const searchParams = useSearchParams(); // 현재 URL의 매개변수 (ex. {query: 'pending'})
   const pathname = usePathname(); // 현재 URL의 경로명 (ex. /dashboard/invoices)
   const { replace } = useRouter();
 
-  function handleSearch(term: string) {
+  const handleSearch = useDebouncedCallback((term: string) => {
+    // console.log(`Searching... ${term}`);
     const params = new URLSearchParams(searchParams);
     if (term) {
       params.set('query', term);
@@ -16,7 +18,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
       params.delete('query');
     }
     replace(`${pathname}?${params.toString()}`); // ex. /dashboard/invoices?query=pending
-  }
+  }, 300);
 
   return (
     <div className="relative flex flex-1 flex-shrink-0">
